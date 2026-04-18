@@ -31,7 +31,7 @@ npm install
 npm run dev
 ```
 
-UI: `http://127.0.0.1:5173` (proxies `/api` and `/ws` to the backend).
+UI: `http://127.0.0.1:5173` (proxies `/api`, including WebSockets, to the backend).
 
 ### 3) Use the app
 
@@ -48,7 +48,7 @@ UI: `http://127.0.0.1:5173` (proxies `/api` and `/ws` to the backend).
 
 - **“No libpcap provider” / empty interfaces:** install Npcap (Windows) or libpcap; restart the terminal after installing Npcap.
 - **Permission errors on capture:** run the backend process elevated (Administrator / sudo).
-- **WebSocket stuck on “Connecting”:** ensure the backend is running and the UI is opened via the Vite dev server so `/ws` proxies correctly.
+- **WebSocket stuck on “Connecting”:** ensure the backend is running and the UI is opened via the Vite dev server so `/api` proxies correctly (including `/api/ws/live`).
 
 ## Academic use
 

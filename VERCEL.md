@@ -1,45 +1,31 @@
-# Deploying NetworkPulse on Vercel
+# Deploying NetworkPulse on Vercel (Services)
 
-## What runs on Vercel
+## Monorepo layout
 
-Only the **React (Vite) frontend** can be deployed on Vercel. The **FastAPI + Scapy** backend cannot run on Vercel: it needs a long-lived process, raw packet capture (Npcap), and often Administrator rights on Windows.
+The repo root contains **`vercel.json`** with **`experimentalServices`** so Vercel can deploy both:
 
-Host the API elsewhere, for example:
+| Service    | Folder      | Route prefix | Role        |
+|-----------|-------------|--------------|-------------|
+| `frontend` | `frontend/` | `/`          | Vite SPA    |
+| `api`      | `backend/app/main.py` | `/api` | FastAPI     |
 
-- A **VPS** (DigitalOcean, Linode, AWS EC2) with your Python stack
-- **Railway**, **Render**, **Fly.io**, or **Google Cloud Run** (with limitations for capture)
+In the Vercel project, set the **framework / project type** to **Services** when prompted.
 
-Point the frontend at that API using the environment variable below.
+## Environment variables
 
-## Frontend (this repo)
+- **Same-domain deploy (recommended):** leave **`VITE_API_BASE_URL`** unset. The UI calls `/api/...` and **`wss://…/api/ws/live`** on the same host.
+- **Split deploy (UI on Vercel, API elsewhere):** set `VITE_API_BASE_URL` to your API origin (see below).
 
-1. Push the project to GitHub/GitLab/Bitbucket.
-2. In [Vercel](https://vercel.com) → **Add New Project** → import the repo.
-3. Set **Root Directory** to `networkpulse-analyzer/frontend` (or `frontend` if the repo root is already `networkpulse-analyzer`).
-4. **Environment variables** (Production / Preview):
+## WebSocket path
 
-   | Name | Example value |
-   |------|----------------|
-   | `VITE_API_BASE_URL` | `https://your-api.onrender.com` |
+Live packets use **`/api/ws/live`** so traffic stays under the `/api` service prefix (required for Vercel Services routing).
 
-   Use the **origin only**: `https://host` with **no** trailing slash. No `/api` suffix — the app calls `/api/...` and `/ws/...` on that host.
+## Backend limits on Vercel
 
-5. Deploy. The build command is `npm run build`; output is `dist` (see `vercel.json`).
+The FastAPI service on Vercel is **serverless-oriented**. **Scapy / raw packet capture usually will not work** there (no Npcap, no long-lived sniffer). For a **production** capture lab, run the Python API on a **VPS or dedicated machine** and point `VITE_API_BASE_URL` at it.
 
-## Backend checklist (any host)
+If the Python build fails (e.g. native deps), deploy **only the frontend**: remove the `api` entry from `experimentalServices` in `vercel.json` and set `VITE_API_BASE_URL` to your external API.
 
-- Serve FastAPI with **HTTPS** in production so the browser can use **`wss://`** for WebSockets.
-- **CORS**: allow your Vercel domain (or use `*` only for testing). The app sends `Authorization: Bearer` and calls `/api/*`, `/ws/live`.
-- **WebSockets**: your reverse proxy (Nginx, Caddy, etc.) must support WebSocket **upgrade** for path `/ws/live`.
+## Local dev
 
-## Local dev (unchanged)
-
-Leave `VITE_API_BASE_URL` unset. `npm run dev` uses the Vite proxy to `http://127.0.0.1:8000`.
-
-Optional: create `frontend/.env.local` with:
-
-```env
-VITE_API_BASE_URL=http://127.0.0.1:8000
-```
-
-to hit a local API without the proxy.
+Unchanged: `npm run dev` in `frontend/` proxies `/api` (HTTP + WebSocket) to `http://127.0.0.1:8000`.

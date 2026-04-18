@@ -29,7 +29,7 @@ export function useLivePackets(token: string | null, enabled: boolean) {
       return;
     }
 
-    const url = wsUrl("/ws/live", token);
+    const url = wsUrl("/api/ws/live", token);
     const ws = new WebSocket(url);
     wsRef.current = ws;
 

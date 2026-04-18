@@ -158,7 +158,7 @@ async def packets_recent(_: User = Depends(get_current_user)):
     return {"packets": list(recent_packets)}
 
 
-@app.websocket("/ws/live")
+@app.websocket("/api/ws/live")
 async def ws_live(websocket: WebSocket):
     await websocket.accept()
     token = websocket.query_params.get("token")
