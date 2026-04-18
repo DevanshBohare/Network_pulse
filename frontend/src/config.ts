@@ -1,6 +1,7 @@
 /**
- * Production (Vercel): set VITE_API_BASE_URL to your FastAPI origin, e.g. https://api.yourdomain.com
- * Dev: leave unset — Vite proxies `/api` (including WebSocket) to localhost:8000.
+ * Optional absolute API origin (e.g. https://api.example.com). No trailing slash.
+ * Leave unset for same-origin requests: Vercel Services monorepo, or `npm run dev` with Vite proxy.
+ * Set only when the UI is hosted separately from the FastAPI host.
  */
 export function getApiBase(): string {
   const raw = import.meta.env.VITE_API_BASE_URL as string | undefined;

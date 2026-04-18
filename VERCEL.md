@@ -13,8 +13,8 @@ In the Vercel project, set the **framework / project type** to **Services** when
 
 ## Environment variables
 
-- **Same-domain deploy (recommended):** leave **`VITE_API_BASE_URL`** unset. The UI calls `/api/...` and **`wss://…/api/ws/live`** on the same host.
-- **Split deploy (UI on Vercel, API elsewhere):** set `VITE_API_BASE_URL` to your API origin (see below).
+- **Same Vercel project (Services: frontend + api):** do **not** set `VITE_API_BASE_URL`. The browser should call **`/api/...`** on the same origin (relative URLs). Setting it to your `*.vercel.app` URL is optional but unnecessary and can cause mistakes if the value is wrong.
+- **UI on Vercel, API on another host** (Render, Railway, VPS): set **`VITE_API_BASE_URL`** to that API origin (no trailing slash), then **redeploy** the frontend so Vite embeds it at build time.
 
 ## WebSocket path
 
