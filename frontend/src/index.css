@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  height: 100%;
+}
+
+body,
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+body {
+  @apply bg-surface-900 bg-mesh;
+}
+
+.glass {
+  @apply rounded-2xl border border-white/10 bg-white/[0.04] shadow-glass backdrop-blur-xl;
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+@layer components {
+  .auth-form-glow-cyan {
+    background: linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.35),
+      rgba(99, 102, 241, 0.15) 50%,
+      rgba(167, 139, 250, 0.12)
+    );
+  }
+
+  .auth-form-glow-violet {
+    background: linear-gradient(
+      135deg,
+      rgba(167, 139, 250, 0.38),
+      rgba(244, 114, 182, 0.14) 55%,
+      rgba(34, 211, 238, 0.08)
+    );
+  }
+
+  .auth-primary-btn {
+    @apply relative overflow-hidden rounded-2xl py-4 text-sm font-semibold tracking-tight text-surface-900 shadow-[0_16px_40px_-12px_rgba(34,211,238,0.45)] transition duration-300;
+    @apply bg-gradient-to-r from-cyan-300 via-cyan-200 to-indigo-300 hover:brightness-[1.03] hover:shadow-[0_20px_50px_-12px_rgba(34,211,238,0.55)] active:scale-[0.99] disabled:opacity-50 disabled:shadow-none;
+  }
+
+  .auth-primary-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%) skewX(-12deg);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .auth-primary-btn:hover::after {
+    transform: translateX(120%) skewX(-12deg);
+  }
+
+  .auth-violet-btn {
+    @apply relative overflow-hidden rounded-2xl py-4 text-sm font-semibold tracking-tight text-white shadow-[0_16px_40px_-12px_rgba(167,139,250,0.45)] transition duration-300;
+    @apply bg-gradient-to-r from-violet-500 via-fuchsia-500 to-rose-500 hover:brightness-[1.04] hover:shadow-[0_20px_50px_-12px_rgba(167,139,250,0.5)] active:scale-[0.99] disabled:opacity-50 disabled:shadow-none;
+  }
+
+  .auth-violet-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%) skewX(-12deg);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.35),
+      transparent
+    );
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .auth-violet-btn:hover::after {
+    transform: translateX(120%) skewX(-12deg);
+  }
+
+  .auth-input {
+    @apply w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] py-3.5 pl-11 pr-4 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] outline-none transition-all duration-300 placeholder:text-zinc-600;
+  }
+
+  .auth-input-cyan:focus {
+    @apply border-cyan-400/50 bg-white/[0.055] shadow-[0_0_0_3px_rgba(34,211,238,0.14),inset_0_1px_0_rgba(255,255,255,0.06)];
+  }
+
+  .auth-input-violet:focus {
+    @apply border-violet-400/50 bg-white/[0.055] shadow-[0_0_0_3px_rgba(167,139,250,0.16),inset_0_1px_0_rgba(255,255,255,0.06)];
+  }
+}
