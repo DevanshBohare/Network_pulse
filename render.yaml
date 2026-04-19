@@ -1,0 +1,13 @@
+# Optional: Render Blueprint — connect repo and use "Apply blueprint" or commit this file.
+# Adjust repo paths if your Git root differs.
+services:
+  - type: web
+    name: networkpulse-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHONUNBUFFERED
+        value: "1"

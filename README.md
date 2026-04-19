@@ -39,6 +39,10 @@ UI: `http://127.0.0.1:5173` (proxies `/api`, including WebSockets, to the backen
 2. Pick a **network interface**, optionally set a **BPF filter** (e.g. `tcp port 443`).
 3. Click **Start** — packets stream into the table and charts in real time.
 
+## Deployment
+
+See **[DEPLOY.md](DEPLOY.md)** for Render + Vercel, Docker, and notes on **live capture** in the cloud vs on your machine.
+
 ## Project layout
 
 - `backend/` — FastAPI, SQLAlchemy (async SQLite), Scapy sniffer thread, WebSocket broadcast.
