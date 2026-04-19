@@ -9,11 +9,37 @@ import time
 import uuid
 from collections import deque
 from dataclasses import dataclass, field
+from functools import lru_cache
+from types import SimpleNamespace
 from typing import Any, Callable
 
-from scapy.all import IP, IPv6, TCP, UDP, ICMP, ARP, Ether, DNS, Raw, sniff, get_if_list, conf
-
 PacketCallback = Callable[[dict[str, Any]], None]
+
+
+@lru_cache(maxsize=1)
+def _load_scapy() -> SimpleNamespace:
+    """Lazy import so uvicorn can bind to $PORT before Render's health timeout.
+
+    Importing scapy.all at module load can take 30s+ on cold Linux containers.
+    """
+    from scapy.all import ARP, DNS, Ether, ICMP, IP, IPv6, Raw, TCP, UDP, conf, get_if_list, sniff
+    from scapy.interfaces import IFACES
+
+    return SimpleNamespace(
+        ARP=ARP,
+        DNS=DNS,
+        Ether=Ether,
+        ICMP=ICMP,
+        IP=IP,
+        IPv6=IPv6,
+        Raw=Raw,
+        TCP=TCP,
+        UDP=UDP,
+        conf=conf,
+        get_if_list=get_if_list,
+        sniff=sniff,
+        IFACES=IFACES,
+    )
 
 
 def _safe_str(x: object) -> str:
@@ -23,6 +49,10 @@ def _safe_str(x: object) -> str:
 
 
 def summarize_packet(pkt) -> dict[str, Any]:
+    L = _load_scapy()
+    Ether, ARP, IP, IPv6 = L.Ether, L.ARP, L.IP, L.IPv6
+    TCP, UDP, ICMP, DNS, Raw = L.TCP, L.UDP, L.ICMP, L.DNS, L.Raw
+
     ts = time.time()
     pid = str(uuid.uuid4())[:12]
 
@@ -183,7 +213,7 @@ class PacketSniffer:
                 pass
 
         try:
-            sniff(
+            _load_scapy().sniff(
                 iface=self._iface,
                 prn=prn,
                 store=False,
@@ -274,13 +304,14 @@ def _label_from_scapy_iface(iface: Any) -> str:
 
 def list_interfaces() -> list[dict[str, str]]:
     """Return usable interfaces: `id` is what Scapy sniffs; `label` is human-readable (e.g. Wi-Fi)."""
+    L = _load_scapy()
+    IFACES, get_if_list, conf = L.IFACES, L.get_if_list, L.conf
+
     out: list[dict[str, str]] = []
     seen: set[str] = set()
     win_guid_map = _windows_guid_to_friendly_name()
 
     try:
-        from scapy.interfaces import IFACES
-
         for iface in IFACES.values():
             dev_id = getattr(iface, "name", None) or ""
             if not dev_id or dev_id in seen:

@@ -97,6 +97,12 @@ Put **Nginx** or **Caddy** in front with **HTTPS** and proxy `/` to static `fron
 
 ---
 
+## Render: “Exited with status 3” or deploy timeout
+
+Render expects the process to **listen on `$PORT` quickly**. Loading **Scapy** at import time can take **30+ seconds** on a cold Linux instance, so the platform may kill the worker before Uvicorn binds. This repo **lazy-loads Scapy** on first capture/interface use so the API starts in a few seconds. If you still see failures, open the full log on Render — the traceback there is definitive.
+
+---
+
 ## Checklist
 
 - [ ] Backend reachable at `https://…/docs`
