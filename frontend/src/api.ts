@@ -1,8 +1,17 @@
 import { getApiBase } from "@/config";
 
-function authHeader(token: string | null): HeadersInit {
+function isNgrokApi(): boolean {
+  const b = getApiBase();
+  return Boolean(b && b.includes("ngrok"));
+}
+
+/** Headers for JSON API calls. ngrok free tier serves an HTML interstitial without CORS unless we skip it. */
+function apiHeaders(token: string | null): HeadersInit {
   const h: Record<string, string> = { "Content-Type": "application/json" };
   if (token) h.Authorization = `Bearer ${token}`;
+  if (isNgrokApi()) {
+    h["ngrok-skip-browser-warning"] = "true";
+  }
   return h;
 }
 
@@ -14,7 +23,7 @@ export async function apiFetch<T>(
   const url = path.startsWith("http") ? path : `${base}${path}`;
   const res = await fetch(url, {
     method: opts.method ?? "GET",
-    headers: authHeader(opts.token ?? null),
+    headers: apiHeaders(opts.token ?? null),
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
   });
   if (!res.ok) {
@@ -38,7 +47,11 @@ export function wsUrl(path: string, token: string): string {
   if (base) {
     const u = new URL(base);
     const wsProto = u.protocol === "https:" ? "wss:" : "ws:";
-    return `${wsProto}//${u.host}${path}?token=${encodeURIComponent(token)}`;
+    const q = new URLSearchParams({ token });
+    if (base.includes("ngrok")) {
+      q.set("ngrok-skip-browser-warning", "true");
+    }
+    return `${wsProto}//${u.host}${path}?${q.toString()}`;
   }
   const proto = window.location.protocol === "https:" ? "wss" : "ws";
   return `${proto}://${window.location.host}${path}?token=${encodeURIComponent(token)}`;
